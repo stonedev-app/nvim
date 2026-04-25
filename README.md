@@ -22,3 +22,17 @@
 | `Space` `g` `f` | `:LazyGitCurrentFile` | 現在のファイルの Git 履歴を開く |
 
 lazygit を閉じるときは `q` または `Ctrl+c` です。
+
+#### インストール
+
+lazygit 本体を事前にインストールしておく必要があります。
+
+**macOS:**
+```sh
+brew install lazygit
+```
+
+**Windows:**
+```sh
+winget install JesseDuffield.lazygit
+```
