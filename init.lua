@@ -44,8 +44,7 @@ require("lazy").setup({
   -- マークダウンファイルをブラウザでリアルタイムプレビューするプラグイン
   -- Neovimでの編集内容がブラウザに即時反映され、スクロール位置も同期される
   -- GitHub: https://github.com/iamcco/markdown-preview.nvim
-  -- 必要環境: Node.js（初回インストール時に npm install が実行される）
-  --   未インストールの場合: brew install node
+  -- 必要環境: なし（事前ビルド済みバイナリを自動ダウンロードする方式を使用）
   -- ===========================================================================
   {
     "iamcco/markdown-preview.nvim",
@@ -56,9 +55,15 @@ require("lazy").setup({
     -- マークダウンファイルを開いたときだけ読み込む（他のファイルタイプでは不要）
     ft = { "markdown" },
 
-    -- 初回インストール時に自動でビルドする（プラグイン内部の依存パッケージを取得）
-    -- ここを実行しないとプレビューサーバーが起動しない
-    build = "cd app && npm install",
+    -- 初回インストール時にプラグイン公式の install 関数を実行する
+    -- 事前ビルド済みバイナリをダウンロードするため Node.js / npm 不要
+    -- （npm install 方式だと yarn.lock の差分検知エラーが発生するため避ける）
+    build = function()
+      -- ビルド時点ではプラグインの autoload 関数が未ロードなので
+      -- :Lazy load で先にプラグインを読み込んでから install 関数を呼ぶ
+      vim.cmd([[Lazy load markdown-preview.nvim]])
+      vim.fn["mkdp#util#install"]()
+    end,
 
     -- プラグイン読み込み前に実行する初期設定
     init = function()
@@ -121,5 +126,6 @@ require("lazy").setup({
       },
     },
   },
+
 
 })
