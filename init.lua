@@ -81,4 +81,45 @@ require("lazy").setup({
     },
   },
 
+  -- ===========================================================================
+  -- lazygit.nvim
+  -- Neovim のフローティングウィンドウで lazygit を開くプラグイン
+  -- ファイル編集中にそのまま Git 操作ができ、閉じると元のバッファに戻れる
+  -- GitHub: https://github.com/kdheepak/lazygit.nvim
+  -- 必要環境: lazygit がインストール済みであること
+  --   未インストールの場合: brew install lazygit
+  -- ===========================================================================
+  {
+    "kdheepak/lazygit.nvim",
+
+    -- このコマンドを実行したときにプラグインを読み込む（遅延読み込み）
+    cmd = {
+      "LazyGit",               -- lazygit をフローティングウィンドウで開く
+      "LazyGitConfig",         -- lazygit の設定ファイルを開く
+      "LazyGitCurrentFile",    -- 現在のファイルの Git ログを開く
+      "LazyGitFilter",         -- プロジェクトの Git ログを開く
+      "LazyGitFilterCurrentFile", -- 現在のファイルの Git ログをフィルタして開く
+    },
+
+    -- plenary.nvim は Neovim プラグイン開発用のユーティリティライブラリ
+    -- lazygit.nvim が内部で使用するため自動でインストールされる
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+
+    -- キーマッピング
+    keys = {
+      {
+        "<leader>gg",          -- キー: スペース + g + g
+        "<cmd>LazyGit<cr>",    -- lazygit をフローティングウィンドウで開く
+        desc = "LazyGit",
+      },
+      {
+        "<leader>gf",                       -- キー: スペース + g + f
+        "<cmd>LazyGitCurrentFile<cr>",      -- 現在のファイルの Git ログを表示
+        desc = "LazyGit Current File",
+      },
+    },
+  },
+
 })
