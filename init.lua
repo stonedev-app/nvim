@@ -149,8 +149,8 @@ require("lazy").setup({
         desc = "LazyGit",
       },
       {
-        "<leader>gf",                       -- キー: スペース + g + f
-        "<cmd>LazyGitCurrentFile<cr>",      -- 現在のファイルの Git ログを表示
+        "<leader>gf",                             -- キー: スペース + g + f
+        "<cmd>LazyGitFilterCurrentFile<cr>",      -- 現在のファイルを変更したコミットだけに絞って表示
         desc = "LazyGit Current File",
       },
     },
