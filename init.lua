@@ -125,7 +125,7 @@ require("lazy").setup({
       -- ビルド時点ではプラグインの autoload 関数が未ロードなので
       -- :Lazy load で先にプラグインを読み込んでから install 関数を呼ぶ
       vim.cmd([[Lazy load markdown-preview.nvim]])
-      vim.fn["mkdp#util#install"]()
+      vim.fn["mkdp#util#install_sync"](1)
     end,
 
     -- プラグイン読み込み前に実行する初期設定
