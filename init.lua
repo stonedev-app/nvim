@@ -231,4 +231,77 @@ require("lazy").setup({
     end,
   },
 
+  -- ===========================================================================
+  -- LSP（Language Server Protocol）: IDE 相当の定義ジャンプ・補完・参照を実現
+  -- ---------------------------------------------------------------------------
+  -- 役割：
+  --   言語サーバー（clangd 等）と通信し、定義に飛ぶ（gd）・ホバードキュメント
+  --   （K）・参照一覧（gr）・シンボルのリネーム（<leader>rn）を提供する。
+  --   キーマップは後述の LspAttach autocmd で設定する。
+  --
+  -- なぜ LSP か（ctags ではなく）：
+  --   ctags は静的なテキスト解析でタグファイルを生成するため手動更新が必要で、
+  --   C++ のテンプレートやオーバーロードに弱い。LSP はコードを意味的に理解し
+  --   リアルタイムで動作するため、精度と利便性が大きく上回る。
+  --
+  -- 3 プラグインの役割分担：
+  --   mason.nvim          : LSP サーバーを Neovim 内から install/管理する GUI
+  --                         （:Mason コマンドで操作できる）
+  --   mason-lspconfig.nvim: mason と nvim-lspconfig を橋渡しし自動インストール
+  --   nvim-lspconfig      : 各言語サーバーの設定を Neovim に読み込む
+  --
+  -- 言語を増やす場合：
+  --   ensure_installed に追加 → lspconfig.<server>.setup({}) を追加するだけ
+  --
+  -- 必要環境: なし（mason が LSP サーバーを自動ダウンロードする）
+  -- ===========================================================================
+  {
+    "neovim/nvim-lspconfig",
+    dependencies = {
+      -- LSP サーバーのインストールと管理を Neovim 内で完結させる
+      { "williamboman/mason.nvim", config = true },
+      -- mason でインストールしたサーバーを lspconfig へ自動連携する
+      "williamboman/mason-lspconfig.nvim",
+    },
+    config = function()
+      -- 使いたい LSP サーバーを列挙する（mason が自動でインストールする）
+      -- 言語を増やす場合はここにサーバー名を追加するだけでよい
+      require("mason-lspconfig").setup({
+        ensure_installed = {
+          "clangd",   -- C / C++（PlatformIO / Arduino を含む）
+        },
+      })
+
+      -- clangd: C/C++ 向け LSP サーバー
+      -- PlatformIO の場合は compile_commands.json が必要:
+      --   プロジェクトルートで `pio run --target compiledb` を一度実行すること
+      -- vim.lsp.enable は Neovim 0.11 の新 API。
+      -- nvim-lspconfig がサーバーのデフォルト設定を vim.lsp.config に登録済みなので
+      -- ここでは「有効化する」だけでよい（旧: require("lspconfig").clangd.setup({})）
+      vim.lsp.enable("clangd")
+    end,
+  },
+
+})
+
+-- =============================================================================
+-- LSP キーマップ設定
+-- =============================================================================
+-- なぜ LspAttach autocmd 経由で書くのか：
+--   LSP サーバーが接続されたバッファにだけ有効なキーマップを設定できる。
+--   直接 vim.keymap.set で書くと「LSP が不要なバッファ」にも gd が割り当たり
+--   意図しない動作を引き起こす恐れがある。
+vim.api.nvim_create_autocmd("LspAttach", {
+  callback = function(ev)
+    local opts = { buffer = ev.buf }
+    -- gd : 定義に移動（関数・型・変数の宣言箇所へジャンプ）
+    vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+    -- gr : 参照一覧を表示（この関数がどこで使われているかを一覧表示）
+    vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+    -- K  : ホバードキュメント表示（型情報・関数シグネチャ・説明を表示）
+    vim.keymap.set("n", "K",  vim.lsp.buf.hover, opts)
+    -- <leader>rn : シンボルのリネーム（参照箇所をまとめて一括変更）
+    vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+  end,
+  desc = "LSP が接続されたバッファにキーマップを設定",
 })

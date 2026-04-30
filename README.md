@@ -37,6 +37,28 @@ brew install lazygit
 winget install JesseDuffield.lazygit
 ```
 
+### LSP（定義ジャンプ・ホバー・参照）
+
+LSP サーバーが接続されているバッファで有効です（C/C++ など）。
+
+| キー | 説明 |
+|---|---|
+| `g` `d` | 定義に移動 |
+| `g` `r` | 参照一覧を表示 |
+| `K` | ホバードキュメント（型情報・関数シグネチャ）を表示 |
+| `Space` `r` `n` | シンボルをリネーム（参照箇所を一括変更） |
+
+LSP サーバーは初回起動時に mason が自動インストールします。`:Mason` で管理 UI を開けます。
+
+#### PlatformIO（Arduino）プロジェクトで使う場合
+
+clangd がインクルードパスを認識するために `compile_commands.json` が必要です。  
+プロジェクトルートで一度だけ実行してください。
+
+```sh
+pio run --target compiledb
+```
+
 ## インデント
 
 ファイルの中身からインデントスタイル（タブ／スペース・幅）を自動検出します（VSCode の "Detect Indentation" 相当）。
