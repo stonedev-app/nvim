@@ -59,6 +59,21 @@ clangd がインクルードパスを認識するために `compile_commands.jso
 pio run --target compiledb
 ```
 
+## シンタックスハイライト
+
+`.v`（Verilog）ファイルを開くと `module`・`input`・`output`・`wire`・`reg`・`always` などのキーワードが自動でハイライトされます。
+
+パーサーは初回起動時に `nvim-treesitter` が自動ビルドします。追加操作は不要です。
+
+#### 必要環境
+
+C コンパイラ（`cc` / `gcc` / `clang`）が PATH に存在すること（パーサーの初回ビルドに使用）。  
+macOS では通常インストール済みです。未インストールの場合：
+
+```sh
+xcode-select --install
+```
+
 ## インデント
 
 ファイルの中身からインデントスタイル（タブ／スペース・幅）を自動検出します（VSCode の "Detect Indentation" 相当）。

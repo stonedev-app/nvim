@@ -307,6 +307,67 @@ require("lazy").setup({
     end,
   },
 
+  -- ===========================================================================
+  -- nvim-treesitter
+  -- -------------------------------------------------------------------------
+  -- 役割：
+  --   ファイルの内容をシンタックスツリーとして解析し、正確な構文ハイライトと
+  --   インデント補助を提供する。Neovim 組み込みの正規表現ベースのハイライトより
+  --   正確で、ネストが深い構造や複雑な文法でも色が崩れにくい。
+  --
+  -- なぜ nvim-treesitter にしたか：
+  --   ・Verilog（.v）は組み込みの正規表現ベースハイライトでは module 宣言・
+  --     always ブロック・ポート一覧などが正しく色付けされないことが多い
+  --   ・nvim-treesitter に "systemverilog" パーサーが公式収録されており、
+  --     SystemVerilog は Verilog の上位互換なので .v ファイルにも適用できる
+  --   ・Neovim 公式が推奨するハイライト基盤であり、tokyonight.nvim も
+  --     Treesitter のトークングループに合わせて配色を最適化している
+  --   ・将来的に他言語を追加する際も install() の引数にパーサー名を足すだけでよい
+  --
+  -- .v ファイルの filetype 判定について：
+  --   Neovim は .v ファイルの中身を読んで filetype を自動判別する。
+  --   行末に ; がある、または module 名( のパターンがあれば "verilog" と判定される。
+  --   通常の Verilog ファイルであれば追加設定なしで本パーサーが適用される。
+  --
+  -- GitHub: https://github.com/nvim-treesitter/nvim-treesitter
+  -- 必要環境: C コンパイラ（cc / gcc / clang）が PATH に存在すること
+  --   macOS では Xcode Command Line Tools に付属（xcode-select --install で入る）
+  --   パーサーの初回ビルド時のみ使用する。以降は不要。
+  -- ===========================================================================
+  {
+    "nvim-treesitter/nvim-treesitter",
+
+    -- パーサー（言語ごとの文法定義 .so ファイル）を更新するコマンド
+    -- インストール・アップデート時に自動実行される
+    build = ":TSUpdate",
+
+    -- ファイルを開いたときに遅延読み込みする
+    event = { "BufReadPost", "BufNewFile" },
+
+    config = function()
+      -- verilog パーサーが未インストールなら自動インストールする
+      -- 新 API では ensure_installed は廃止。インストール関数を直接呼ぶ。
+      -- systemverilog パーサーが未インストールなら自動インストールする
+      -- 新 API では ensure_installed は廃止。インストール関数を直接呼ぶ。
+      -- ※ 旧版の "verilog" パーサーは廃止済み。"systemverilog" が後継。
+      local installed = require("nvim-treesitter.config").get_installed()
+      if not vim.tbl_contains(installed, "systemverilog") then
+        require("nvim-treesitter.install").install({ "systemverilog" }, { summary = true })
+      end
+
+      -- verilog ファイルを開いたとき Treesitter ハイライトを有効化する
+      -- filetype は "verilog" だが、パーサーは "systemverilog" を明示的に指定する
+      -- （SystemVerilog は Verilog の上位互換なので .v ファイルにも適用できる）
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "verilog",
+        callback = function(ev)
+          pcall(vim.treesitter.start, ev.buf, "systemverilog")
+        end,
+        desc = "verilog ファイルで Treesitter ハイライトを有効化",
+      })
+    end,
+  },
+
 })
 
 -- =============================================================================
