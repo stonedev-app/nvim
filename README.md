@@ -14,6 +14,10 @@
 | — | `:MarkdownPreview` | プレビュー開始 |
 | — | `:MarkdownPreviewStop` | プレビュー停止 |
 
+#### 必要環境
+
+Node.js — プレビュー用バイナリのインストールに必要です。
+
 ### Git (lazygit)
 
 | キー | コマンド | 説明 |
@@ -63,16 +67,21 @@ pio run --target compiledb
 
 `.v`（Verilog）ファイルを開くと `module`・`input`・`output`・`wire`・`reg`・`always` などのキーワードが自動でハイライトされます。
 
-パーサーは初回起動時に `nvim-treesitter` が自動ビルドします。追加操作は不要です。
+パーサーは初回起動時に `nvim-treesitter` が自動ビルドします（下記の必要環境が揃っていれば追加操作は不要です）。
 
 #### 必要環境
 
-C コンパイラ（`cc` / `gcc` / `clang`）が PATH に存在すること（パーサーの初回ビルドに使用）。  
-macOS では通常インストール済みです。未インストールの場合：
+- **C コンパイラ**（`cc` / `gcc` / `clang`）— パーサーの初回ビルドに使用。macOS では通常インストール済みです。未インストールの場合：
 
-```sh
-xcode-select --install
-```
+  ```sh
+  xcode-select --install
+  ```
+
+- **tree-sitter-cli** — パーサーのビルドに必要
+
+  ```sh
+  brew install tree-sitter-cli
+  ```
 
 ## インデント
 

@@ -144,7 +144,7 @@ require("lazy").setup({
   -- マークダウンファイルをブラウザでリアルタイムプレビューするプラグイン
   -- Neovimでの編集内容がブラウザに即時反映され、スクロール位置も同期される
   -- GitHub: https://github.com/iamcco/markdown-preview.nvim
-  -- 必要環境: なし（事前ビルド済みバイナリを自動ダウンロードする方式を使用）
+  -- 必要環境: Node.js（プレビュー用バイナリのインストールに必要）
   -- ===========================================================================
   {
     "iamcco/markdown-preview.nvim",
@@ -156,12 +156,12 @@ require("lazy").setup({
     ft = { "markdown" },
 
     -- 初回インストール時にプラグイン公式の install 関数を実行する
-    -- 事前ビルド済みバイナリをダウンロードするため Node.js / npm 不要
+    -- install_sync はプレビュー用バイナリをダウンロードする方式（要 Node.js）
     -- （npm install 方式だと yarn.lock の差分検知エラーが発生するため避ける）
     build = function()
       -- ビルド時点ではプラグインの autoload 関数が未ロードなので
-      -- :Lazy load で先にプラグインを読み込んでから install 関数を呼ぶ
-      vim.cmd([[Lazy load markdown-preview.nvim]])
+      -- lazy.nvim の load() で先にプラグインを読み込んでから install 関数を呼ぶ
+      require("lazy").load({ plugins = { "markdown-preview.nvim" } })
       vim.fn["mkdp#util#install_sync"](1)
     end,
 
@@ -342,9 +342,12 @@ require("lazy").setup({
   --   通常の Verilog ファイルであれば追加設定なしで本パーサーが適用される。
   --
   -- GitHub: https://github.com/nvim-treesitter/nvim-treesitter
-  -- 必要環境: C コンパイラ（cc / gcc / clang）が PATH に存在すること
-  --   macOS では Xcode Command Line Tools に付属（xcode-select --install で入る）
-  --   パーサーの初回ビルド時のみ使用する。以降は不要。
+  -- 必要環境:
+  --   ・C コンパイラ（cc / gcc / clang）が PATH に存在すること
+  --     macOS では Xcode Command Line Tools に付属（xcode-select --install で入る）
+  --   ・tree-sitter-cli が PATH に存在すること
+  --     brew install tree-sitter はライブラリのみのため別途 brew install tree-sitter-cli が必要
+  --   いずれもパーサーの初回ビルド時のみ使用する。以降は不要。
   -- ===========================================================================
   {
     "nvim-treesitter/nvim-treesitter",
