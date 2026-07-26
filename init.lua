@@ -312,6 +312,15 @@ require("lazy").setup({
       -- clangd: C/C++ 向け LSP サーバー
       -- PlatformIO の場合は compile_commands.json が必要:
       --   プロジェクトルートで `pio run --target compiledb` を一度実行すること
+      -- --query-driver: PlatformIO のツールチェイン（xtensa/riscv32 等）は
+      --   PATH に無い独自パスの gcc を使うため、明示的に許可しないと
+      --   clangd がシステムインクルードパスを問い合わせできずエラーになる
+      vim.lsp.config("clangd", {
+        cmd = {
+          "clangd",
+          "--query-driver=" .. os.getenv("HOME") .. "/.platformio/packages/**/bin/*",
+        },
+      })
       -- vim.lsp.enable は Neovim 0.11 の新 API。
       -- nvim-lspconfig がサーバーのデフォルト設定を vim.lsp.config に登録済みなので
       -- ここでは「有効化する」だけでよい（旧: require("lspconfig").clangd.setup({})）
