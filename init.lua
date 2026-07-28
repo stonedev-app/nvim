@@ -422,3 +422,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end,
   desc = "LSP が接続されたバッファにキーマップを設定",
 })
+
+-- <leader>e : カーソル行の診断メッセージをフローティングウィンドウで表示
+-- vim.diagnostic は LSP 専用ではない汎用機能なので、LspAttach を待たずに設定する
+vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "診断メッセージを表示" })
