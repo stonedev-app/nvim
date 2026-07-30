@@ -402,8 +402,30 @@ require("lazy").setup({
 vim.o.winborder = "rounded"
 
 -- =============================================================================
--- LSP キーマップ設定
+-- LSP 設定（キーマップ・補完）
 -- =============================================================================
+-- completeopt: LSP補完（<C-x><C-o>）の候補メニュー表示を設定する。
+-- 候補表示後は <C-n>/<C-p> で選択、<C-y> で確定、<C-e> で補完前の状態に戻す。
+vim.opt.completeopt:append({ "menuone", "noselect" })
+
+-- 関数補完を確定すると、引数プレースホルダー入りのスニペットが展開される。
+-- <Tab>/<S-Tab> でプレースホルダー間を順に移動できる。
+-- "i" = 挿入モード、"s" = セレクトモード。プレースホルダーは選択済み状態
+-- （セレクトモード）で表示されるため、両方のモードで効くようにする。
+vim.keymap.set({ "i", "s" }, "<Tab>", function()
+  if vim.snippet.active({ direction = 1 }) then
+    return "<Cmd>lua vim.snippet.jump(1)<CR>"
+  end
+  return "<Tab>"
+end, { expr = true })
+
+vim.keymap.set({ "i", "s" }, "<S-Tab>", function()
+  if vim.snippet.active({ direction = -1 }) then
+    return "<Cmd>lua vim.snippet.jump(-1)<CR>"
+  end
+  return "<S-Tab>"
+end, { expr = true })
+
 -- なぜ LspAttach autocmd 経由で書くのか：
 --   LSP サーバーが接続されたバッファにだけ有効なキーマップを設定できる。
 --   直接 vim.keymap.set で書くと「LSP が不要なバッファ」にも gd が割り当たり
