@@ -318,7 +318,7 @@ require("lazy").setup({
       vim.lsp.config("clangd", {
         cmd = {
           "clangd",
-          "--query-driver=" .. os.getenv("HOME") .. "/.platformio/packages/**/bin/*",
+          "--query-driver=" .. vim.uv.os_homedir() .. "/.platformio/packages/**/bin/*",
         },
       })
       -- vim.lsp.enable は Neovim 0.11 の新 API。
