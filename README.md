@@ -63,6 +63,41 @@ clangd がインクルードパスを認識するために `compile_commands.jso
 pio run --target compiledb
 ```
 
+### 検索（fzf-lua）
+
+| キー | コマンド | 説明 |
+|---|---|---|
+| `Space` `f` `f` | `Files` | ファイル名であいまい検索して開く |
+| `Space` `f` `g` | `Live Grep` | プロジェクト全体をキーワードで全文検索 |
+
+#### 必要環境
+
+`fzf` と `ripgrep`（`rg`）を事前にインストールしておく必要があります。
+
+- `fzf` — ファジーファインダー本体
+
+  **macOS:**
+  ```sh
+  brew install fzf
+  ```
+
+  **Windows:**
+  ```sh
+  winget install junegunn.fzf
+  ```
+
+- `ripgrep`（`rg`）— 全文検索に使用
+
+  **macOS:**
+  ```sh
+  brew install ripgrep
+  ```
+
+  **Windows:**
+  ```sh
+  winget install BurntSushi.ripgrep.MSVC
+  ```
+
 ### ファイラー（oil.nvim）
 
 | キー | 説明 |
