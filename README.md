@@ -63,6 +63,14 @@ clangd がインクルードパスを認識するために `compile_commands.jso
 pio run --target compiledb
 ```
 
+### ファイラー（oil.nvim）
+
+| キー | 説明 |
+|---|---|
+| `-` | 現在のファイルの親ディレクトリを oil で開く |
+
+oil バッファ内の操作（`<CR>` で開く、`g?` でヘルプ表示など）は oil.nvim のデフォルトキーマップに従う。
+
 ## シンタックスハイライト
 
 `.v`（Verilog）ファイルを開くと `module`・`input`・`output`・`wire`・`reg`・`always` などのキーワードが自動でハイライトされます。
