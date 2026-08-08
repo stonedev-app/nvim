@@ -43,7 +43,7 @@ winget install JesseDuffield.lazygit
 
 ### LSP（定義ジャンプ・ホバー・参照）
 
-LSP サーバーが接続されているバッファで有効です（C/C++ など）。
+LSP サーバーが接続されているバッファで有効です（C/C++、Rust など）。
 
 | キー | 説明 |
 |---|---|
@@ -52,7 +52,7 @@ LSP サーバーが接続されているバッファで有効です（C/C++ な�
 | `K` | ホバードキュメント（型情報・関数シグネチャ）を表示 |
 | `Space` `r` `n` | シンボルをリネーム（参照箇所を一括変更） |
 
-LSP サーバーは初回起動時に mason が自動インストールします。`:Mason` で管理 UI を開けます。
+clangd 等の LSP サーバーは初回起動時に mason が自動インストールします。`:Mason` で管理 UI を開けます。
 
 #### PlatformIO（Arduino）プロジェクトで使う場合
 
@@ -62,6 +62,18 @@ clangd がインクルードパスを認識するために `compile_commands.jso
 ```sh
 pio run --target compiledb
 ```
+
+#### Rust プロジェクトで使う場合
+
+rust-analyzer は mason ではなく rustup（Rust 公式のツールチェイン管理ツール）が管理します。`rustc` / `cargo` と一緒にバージョンが同期されるようにするためです。事前に Rust ツールチェインをインストールしておいてください。
+
+```sh
+# 未インストールの場合
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+rustup component add rust-analyzer
+```
+
+`Cargo.toml` があるディレクトリ以下で `.rs` ファイルを開くと自動で LSP が接続されます。
 
 ### 検索（fzf-lua）
 

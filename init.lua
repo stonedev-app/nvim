@@ -279,9 +279,19 @@ require("lazy").setup({
   --   nvim-lspconfig      : 各言語サーバーの設定を Neovim に読み込む
   --
   -- 言語を増やす場合：
-  --   ensure_installed に追加 → lspconfig.<server>.setup({}) を追加するだけ
+  --   ensure_installed に追加 → vim.lsp.enable("<server>") を追加するだけ
   --
-  -- 必要環境: なし（mason が LSP サーバーを自動ダウンロードする）
+  -- ただし rust-analyzer は例外的に mason 管理にしない：
+  --   rustup がツールチェインの一部として rust-analyzer を管理しており
+  --   （rustup component add rust-analyzer）、rustup update で rustc 本体と
+  --   バージョンが同期される。mason にも重複インストールさせると二重管理に
+  --   なるため、ensure_installed には加えず PATH 上の rust-analyzer
+  --   （rustup 管理）を nvim-lspconfig のデフォルト設定でそのまま使う。
+  --
+  -- 必要環境:
+  --   ・mason 管理のサーバー（clangd 等）: なし（mason が自動ダウンロード）
+  --   ・rust-analyzer: rustup で Rust ツールチェインをインストール済みであること
+  --     （rustup component add rust-analyzer で追加。詳細は README.md 参照）
   -- ===========================================================================
   {
     "neovim/nvim-lspconfig",
@@ -316,6 +326,12 @@ require("lazy").setup({
       -- nvim-lspconfig がサーバーのデフォルト設定を vim.lsp.config に登録済みなので
       -- ここでは「有効化する」だけでよい（旧: require("lspconfig").clangd.setup({})）
       vim.lsp.enable("clangd")
+
+      -- rust-analyzer: Rust 向け LSP サーバー
+      -- clangd と違い query-driver のような特殊設定は不要で、Cargo.toml のある
+      -- ディレクトリを自動で root_dir として認識してくれる（nvim-lspconfig の
+      -- デフォルト設定のまま使えるため vim.lsp.config は呼ばず enable するだけ）
+      vim.lsp.enable("rust_analyzer")
     end,
   },
 
