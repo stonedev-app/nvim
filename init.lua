@@ -442,9 +442,18 @@ require("lazy").setup({
       -- なぜこの設定が必要か：
       --   lazygit は cwd 基準で git リポジトリを探すため、oil でディレクトリを
       --   移動しても cwd が追従しないと、移動先の別リポジトリを認識できない。
-      --   User OilEnter は oil でディレクトリを移動するたびに発火するイベント。
-      vim.api.nvim_create_autocmd("User", {
-        pattern = "OilEnter",
+      --
+      -- なぜ User OilEnter ではなく BufEnter を使うか：
+      --   OilEnter は「そのディレクトリ用バッファが初めて作られたとき」だけ
+      --   発火する一度きりのイベント。oil はディレクトリごとに別バッファを持ち、
+      --   一度訪れたディレクトリのバッファは再利用されるため、
+      --   「上位へ移動 → 元のディレクトリへ戻る」という操作をすると
+      --   2回目はバッファが再利用されて OilEnter が発火せず、cwd が
+      --   移動前（上位ディレクトリ）のまま取り残されるバグがあった。
+      --   BufEnter はバッファに入るたびに毎回発火するため、これを使うことで
+      --   再訪問時にも確実に cwd が追従する。
+      vim.api.nvim_create_autocmd("BufEnter", {
+        pattern = "oil://*",
         callback = function()
           local dir = require("oil").get_current_dir()
           if dir then
