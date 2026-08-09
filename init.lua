@@ -316,10 +316,24 @@ require("lazy").setup({
       -- --query-driver: PlatformIO のツールチェイン（xtensa/riscv32 等）は
       --   PATH に無い独自パスの gcc を使うため、明示的に許可しないと
       --   clangd がシステムインクルードパスを問い合わせできずエラーになる
+      -- cmd_env.PATH: --query-driver はあくまで「許可リスト」であり、
+      --   コンパイラ名の解決（PATH探索）自体は別問題。Arduinoフレームワーク
+      --   （PlatformIOのSCoutsビルド）はcompile_commands.jsonにコンパイラを
+      --   フルパスで書き出すため問題にならないが、ESP-IDFフレームワーク
+      --   （CMakeビルド）はベア名（例: xtensa-esp32s3-elf-gcc）で書き出すため、
+      --   $PATHに無いと解決できず --query-driver のglobとも照合されない
+      --   （"driver ... not found in PATH" になる）。そこでclangdプロセスにだけ
+      --   PATHを渡して解決できるようにする
       vim.lsp.config("clangd", {
         cmd = {
           "clangd",
           "--query-driver=" .. vim.uv.os_homedir() .. "/.platformio/packages/**/bin/*",
+        },
+        cmd_env = {
+          PATH = table.concat(
+            vim.fn.glob(vim.uv.os_homedir() .. "/.platformio/packages/toolchain-*/bin", false, true),
+            ":"
+          ) .. ":" .. (vim.env.PATH or ""),
         },
       })
       -- vim.lsp.enable は Neovim 0.11 の新 API。
