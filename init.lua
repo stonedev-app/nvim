@@ -311,23 +311,19 @@ require("lazy").setup({
       })
 
       -- clangd: C/C++ 向け LSP サーバー
-      -- PlatformIO の場合は compile_commands.json が必要:
-      --   プロジェクトルートで `pio run --target compiledb` を一度実行すること
-      -- --query-driver: PlatformIO のツールチェイン（xtensa/riscv32 等）は
-      --   PATH に無い独自パスの gcc を使うため、明示的に許可しないと
-      --   clangd がシステムインクルードパスを問い合わせできずエラーになる
-      -- cmd_env.PATH: --query-driver はあくまで「許可リスト」であり、
-      --   コンパイラ名の解決（PATH探索）自体は別問題。Arduinoフレームワーク
-      --   （PlatformIOのSCoutsビルド）はcompile_commands.jsonにコンパイラを
-      --   フルパスで書き出すため問題にならないが、ESP-IDFフレームワーク
-      --   （CMakeビルド）はベア名（例: xtensa-esp32s3-elf-gcc）で書き出すため、
-      --   $PATHに無いと解決できず --query-driver のglobとも照合されない
-      --   （"driver ... not found in PATH" になる）。そこでclangdプロセスにだけ
-      --   PATHを渡して解決できるようにする
+      -- PlatformIO/ESP-IDFは独自パスのgcc（xtensa/riscv32等）を使うため、
+      -- --query-driver で許可しないとシステムインクルードが解決できない
+      -- （未許可だと stdlib.h 等が file not found になる）
+      -- PlatformIO: compile_commands.jsonはコンパイラをベア名で書くため、
+      --   cmd_env.PATH で toolchain-*/bin を解決させる必要がある
+      --   （生成には `pio run --target compiledb` が必要）
+      -- ESP-IDF (eim): `idf.py build` で build/compile_commands.json が
+      --   自動生成され、コンパイラはフルパスで書かれるためPATH解決は不要
       vim.lsp.config("clangd", {
         cmd = {
           "clangd",
-          "--query-driver=" .. vim.uv.os_homedir() .. "/.platformio/packages/**/bin/*",
+          "--query-driver=" .. vim.uv.os_homedir() .. "/.platformio/packages/**/bin/*,"
+            .. vim.uv.os_homedir() .. "/.espressif/tools/*/*/*/bin/*",
         },
         cmd_env = {
           PATH = table.concat(
